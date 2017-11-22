@@ -1,4 +1,4 @@
-# FINAL PROJECT #
+# Quality Control #
 ## Quality Control ##
 
 The RNA sequencing used in the analysis was a paired end sequencing using Sanger/Illumina 1.9, meaning we have two files per each sample. The original files are found in NCBI under the accession [GSE98379](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98379). For the purpose of quality control we will work only with one of the samples under the code [SRR5488449.sra](ftp://ftp-trace.ncbi.nlm.nih.gov/sra/sra-instant/reads/ByStudy/sra/SRP/SRP105/SRP105764/SRR5488449/).
