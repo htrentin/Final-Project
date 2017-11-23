@@ -1,0 +1,117 @@
+---
+title: "Differential Expression Analysis"
+author: "Fernando Silva Aguilar"
+date: "November 21, 2017"
+output: html_document
+---
+
+## Differential Expression Analysis
+The reads were counted by using the package "[Rsubreads](https://bioconductor.org/packages/release/bioc/html/Rsubread.html)" from R. This provides a useful tool to analyis the reads from next generation sequencing producing as an output the file "[featureCounts](ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98379/suppl/GSE98379_FeatureCounts.csv.gz)"
+
+Then to reproduce the analysis we start by downloading and loading the respective libraries. The analysis was done by using the package "DESeq2", which is load as follows:
+
+```{r}
+
+source("https://bioconductor.org/biocLite.R")
+biocLite("DESeq2")
+library(DESeq2)
+library(dplyr)
+#For theRsubreads
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("Rsubread")
+
+```
+
+## Analizing the data from RNA sequencing
+Some documentation on how to use the package DESeq2 to analysize RNA sequencing data is found in the following [link](http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html). The authors provide the Count matrix, which quickly produces a matrix from alignement files using the "featureCounts" function from Rsubreads package. This file corresponds to an intermediate data file to start the analysis. For further analysis We will called this matrix as "cts". Equally the package DESeq2 requiere the use of the coun matrix cts and a matrix  with the sample information called "coldata". Bothe matrices are going to be loaded and created as follows: 
+
+```{r}
+#Importing the data from NCBI suplental data provided by authors.
+
+url <- "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98379/suppl/GSE98379_FeatureCounts.csv.gz"
+file <- "GSE98379_FeatureCounts.csv.gz"
+download.file(url, destfile = file, mode = "wb")
+conec <- gzcon(gzfile(file, open = "r"))
+cts <- read.csv(textConnection(readLines(conec)), row.names = 1, header = TRUE)
+close(conec)
+rm(conec,file,url) #removing unnecessary data from the environment
+
+# Creating the "coldata" matrix.
+coldata = data.frame(row.names =colnames(cts),sample =rep(c("1", "2", "3"),3,each = 1),Cell = rep(c("Sperm","Egg","Zygote_12HAP", "Zygote_24HAP","Apical","Basal"),each= 3))
+
+coldata$Cell = factor(x = coldata$Cell,levels = c("Sperm","Egg","Zygote_12HAP", "Zygote_24HAP","Apical","Basal"))
+coldata$sample = factor(x = coldata$sample,levels = c("1","2","3"))
+
+```
+
+## DESeq2 Analysis
+It is extremely important tha the name of the rows of the coldata and the name of the columns of cts are the same and that they are arrange in the same order. Once that is fixed we proceed to create the DESeqDataSet in which we take as input the cts and coldata matrices and we assign the especific design that  indicates how to model the data (like a regression analysis of variance).
+
+Our model work only with "Cell" type as the explanatory variable to model the samples. Equally we work by doing the contrast or comparisons between all treatments. This will work as a combinatory 6 Combinatory of 2, which will gives us 15 contrasts.
+
+```{r}
+#Verifying if the columns and rows from boyh files are the same
+all(rownames(coldata) %in% colnames(cts)) 
+
+#DESeqDataSet
+dds <- DESeqDataSetFromMatrix(countData = cts,
+                              colData = coldata,
+                              design = ~ Cell)
+
+#Modeling the samples
+dds <- DESeq(dds)
+resultsNames(dds) #Names of the explanatory variable
+
+#Way to produce all contrast between the 6 type of cells (15 contrasts)
+
+ACvsBC <- as.data.frame(results(dds, contrast = list("CellApical","CellBasal" ) ))
+ACvsEC <- as.data.frame(results(dds, contrast = list("CellApical","CellEgg" ) ))
+ACvsSP <- as.data.frame(results(dds, contrast = list("CellApical","CellSperm" ) ))
+ACvsZy12 <- as.data.frame(results(dds, contrast = list("CellApical","CellZygote_12HAP" ) ))
+ACvsZy24 <- as.data.frame(results(dds, contrast = list("CellApical","CellZygote_24HAP" ) ))
+BCvsEC <- as.data.frame(results(dds, contrast = list("CellBasal","CellEgg" ) ))
+BCvsSP <- as.data.frame(results(dds, contrast = list("CellBasal","CellSperm" ) ))
+BCvsZy12 <- as.data.frame(results(dds, contrast = list("CellBasal","CellZygote_12HAP" ) ))
+BCvsZy24 <- as.data.frame(results(dds, contrast = list("CellBasal","CellZygote_24HAP" ) ))
+ECvsSP <- as.data.frame(results(dds, contrast = list("CellEgg","CellSperm" ) ))
+ECvsZy12 <- as.data.frame(results(dds, contrast = list("CellEgg","CellZygote_12HAP" ) ))
+ECvsZy24 <- as.data.frame(results(dds, contrast = list("CellEgg","CellZygote_24HAP" ) ))
+SPvsZy12 <- as.data.frame(results(dds, contrast = list("CellSperm","CellZygote_12HAP" ) ))
+SPvsZy24 <- as.data.frame(results(dds, contrast = list("CellSperm","CellZygote_24HAP" ) ))
+Zy12vsZy24 <- as.data.frame(results(dds, contrast = list("CellZygote_12HAP","CellZygote_24HAP" ), alpha = 0.05 ))
+
+# Loop to filter the data by Log2FoldChange >= |1.0| and FDR (padj) <= 0.05
+
+      # creation of a list of the dataframes.
+res <- list(ACvsBC, ACvsEC, ACvsSP,ACvsZy12, ACvsZy24, BCvsEC, BCvsSP, BCvsZy12, BCvsZy24, ECvsSP, ECvsZy12, ECvsZy24, SPvsZy12, SPvsZy24, Zy12vsZy24) 
+
+      # creation of a list of the name of the sorted files.
+nombre <- c('ACvsBC', 'ACvsEC', 'ACvsSP','ACvsZy12', 'ACvsZy24', 'BCvsEC', 'BCvsSP', 'BCvsZy12', 'BCvsZy24', 'ECvsSP', 'ECvsZy12', 'ECvsZy24', 'SPvsZy12', 'SPvsZy24', 'Zy12vsZy24') #Creation of 
+
+for(i in seq_along(res)){
+  a <- filter(res[[i]], padj <= 0.05 & abs(log2FoldChange) >= 1.0 )  
+  for(n in nombre){
+  savename = paste0('DE_DESeq2_', n, '.csv')
+  write.table(a, file = savename, quote = FALSE, sep = ",", row.names = FALSE)
+
+}}
+
+```
+
+## Interpretation of the DESeq2 data
+*BaseMean* = The average of the normalized count values, dividing by size factors, taken over all samples.
+
+*log2FoldChange* = The effect size estimate. It measure how much of the gene expression seems to have change due to the treatment.The values in this column are in a logarin=thmic scale to base 2. A value of 1.5 means that the gene expression is increase by a factor of 2 (1.5 ~ 2.82).
+
+*lfcSE* = estimate the uncertainty of the estimation (standard error) of the log2FoldChange.
+
+*stat* = This corresponds to the test statistics to prove the null hypothesis for log2FoldChange of no effect of the treatment on the gene.
+
+*pvalue* = Area under the curve to help us to support or reject the null hypothesis. In other words, this is the probability that a fold change as strong as the observed one, or even stronger, would be seen under the situation described by the null hypothesis.
+
+*padj* = This corrrespond to the FDR (Benjamini and Hochberg, 1995).
+
+For more information we can revise [here](http://bioconductor.jp/packages/2.14/bioc/vignettes/DESeq2/inst/doc/beginner.pdf)   
+
+
+
