@@ -1,0 +1,56 @@
+---
+title: "Figure 1.I"
+author: "Fernando Silva Aguilar"
+date: "November 21, 2017"
+output: html_document
+---
+
+## Reading the data
+To be able to read the data from an online location we use the library "gdata" which enable us to not only read form an online url but to read xls, xlsx, and other formats. The url is specifyeng the link to the original data provided by the authors in the suplemental data. 
+
+*Note: Sometimes we have to download and install ActivePerl program in oru computer to be able to work with the gdata using an online file. Make sure to download that before to work with this. 
+
+```{r}
+
+if(!require("gdata")) install.packages("gdata")
+library(gdata)
+
+url <- file.path("http://www.plantcell.org/highwire/filestream/68088/field_highwire_adjunct_files/0/TPC2017-LSB-00099R2_Supplemental_Data_Set_1.xls")
+suplemental_data1 <- read.xls(url, skip = 2,  header = T) 
+#the skip statement is to specify from where the read.xls is going to start the reading, in other words, where is the first observation.
+
+
+```
+# Reformating the data frame
+To be able to produce the graphs we have to reformat the dataframe. First we create a new dataframe with only the columns of interest (Figure1). Then we make a subset of the dataframe keeping only the preferentially expresed genes for sperm cells, and finally we melt the data frame keeping the gene id as the fixed column. 
+
+
+```{r}
+
+library(reshape2)
+figure1 <- suplemental_data1[1:7]
+
+figure1_I <- subset(figure1, subset = ensembl_gene_id %in% c("GRMZM2G388045", "GRMZM2G036832", "GRMZM2G146786", "GRMZM2G157675", "GRMZM2G012012", "GRMZM2G128301", "GRMZM2G009359", "GRMZM2G456746", "GRMZM2G100639", "GRMZM2G021069", "GRMZM2G034647", "GRMZM2G073671"))
+
+mel_figure1_I <- melt(figure1_I, id=(c("ensembl_gene_id")))
+colnames(mel_figure1_I)[2] <- "Cell_Type" #Renaming the second column
+
+```
+
+# Making the plots
+
+```{r}
+library(ggplot2)
+#The following code is to create the maximum values per each facet to be used in the ggplot command.
+mel_figure1_I$max <- ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G388045", 1000, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G036832", 800, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G146786", 600, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G157675", 3600, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G100639",400, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G021069",450, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G034647", 240, ifelse(mel_figure1_I$ensembl_gene_id == "GRMZM2G073671",360,4000))))))))
+
+ggplot(mel_figure1_I, aes(x = Cell_Type, y=value, fill = Cell_Type)) + 
+  geom_bar(stat = "identity", position = position_dodge()) + 
+  facet_wrap(~factor(mel_figure1_I$ensembl_gene_id, levels = c("GRMZM2G388045", "GRMZM2G036832", "GRMZM2G146786", "GRMZM2G157675","GRMZM2G012012", "GRMZM2G128301", "GRMZM2G009359", "GRMZM2G456746","GRMZM2G100639", "GRMZM2G021069", "GRMZM2G034647", "GRMZM2G073671" )), scales = "free_y", shrink = FALSE) +  
+  theme_minimal()  +  ylab("Transcript level (TPM)") +   scale_x_discrete(breaks = NULL) + 
+  theme(strip.text = element_text(size=8), legend.position = "bottom", legend.title = element_blank()) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n=4)) +  geom_blank(aes(y= max)) + xlab("")
+
+```
+
+
