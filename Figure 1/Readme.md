@@ -1,1 +1,1 @@
-In here we can find the code in R to recreate figure 1I.
+In here we can find the code in R to recreate figure 1I. The data to produce the graph is located online and the R code makes reference to the link to download the data. For that reason is not required to upload the data.
