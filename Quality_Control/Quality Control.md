@@ -68,6 +68,39 @@ According to the cumulative graph we can appreciate that the count of adapters s
 
 This graph is shwing us the top 6 kmer of 7 bp with a significant deviation from an even coverage at all positions. More information can be found [here](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/11%20Kmer%20Content.html)
 
-The above analysis shows a little concern about the quality of the sequences forcing the authors to make a trimming process. Thus, the author makes the remotion of primer contamination and adaptors using the program **cutadapt_v.1.13**. To do that we enter to the hpc-class cluster and download the latest **cutadapt_v1.14** [package](http://cutadapt.readthedocs.io/en/stable/installation.html) by using the following command from git bash (UNIX):
+The above analysis shows a little concern about the quality of the sequences forcing the authors to make a trimming process. Thus, the author removes primer contamination and adaptors using the program **cutadapt_v.1.13** and **Trimmomatic**. 
+
+**# CutAdapt version 1.14 #**
+The latest version of program is downloaded in [here](http://cutadapt.readthedocs.io/en/stable/installation.html) or by using the following command in Linux:
 
 	$ pip install --user --upgrade cutadapt 
+
+We have problems in the use of this program since apparently this one is not able to run in a Windows environment. However, The command that should be used is the following 
+
+	$ cutadapt -q 20 -u 10 -m 20 -o <Output file.fatq> <Input <file.fastq>
+Where the options q is the threshold qphred set up to 20; the option u is to remove kmers localized at the beginning of the sequences (we can use a length of 10 bp to remove them); and the option m is to remove the empty and/or short reads using a length of 20 bp.
+
+After that the file should be analyzed again using the program FASTQC. Usually the overrepresented sequences are kept and thus a step to remove them from the analysis id required. To do so, we should run the following command:
+
+	$ cutadapt -a <overrepresented sequence provided by FASTQC> -o <output file.fastq> <input file.fastq>
+ 
+After this the files should be in shape to be used in Alignment or mapping analysis.
+
+
+**#TRIMMOMATIC#**
+
+The program should be download to our local machines following this link [TRIMMOMATIC](http://www.usadellab.org/cms/?page=trimmomatic). After installing the program we run it using GIT BASH as follows:
+
+	$ java -Xmx2g -classpath ~/trimmomatic.jar org.usadellab.trimmomatic.TrimmomaticSE -phred33 SRR5488449.fastq SRR5488449_trimmed.fastq ILLUMINACLIP:contaminants.fasta:2:40:12 LEADING:10 TRAILING:10 SLIDINGWINDOW:4:18 MINLEN:20
+
+The program trimmomatic requires java in order to run. The option xmx indicates the maximum size of memory allocation. The ~/trimmomatic is invoking the executable of the program. We have to indicate the path of the folder in which the executable is located. At the same time we clarify to the program the type of phred we have in our sequences. 
+
+In order remove contaminants in Illumina analysis we indicate to the program the option "ILLUMNACLIP:contaminants.fasta:2:40:12". The option LEADING is used here to Cut bases off the start of a read (Kmers), if below a threshold of 10bp specified here. The remotion of empty reads or short reads we use the option MINLEN:20. 
+
+After this we have to run again the command specifing to the program how to remove over represented sequences and nextera adapters. The following command should be used:
+
+	$ java -Xmx2g -classpath ~/trimmomatic.jar org.usadellab.trimmomatic.TrimmomaticSE -phred33 SRR5488449_trimmed.fastq SRR5488449_trimmed_adapters.fastq ILLUMINACLIP:NexteraPE-PE.fa:2:30:10 LEADING:5 TRAILING:10 SLIDINGWINDOW:4:18 MINLEN:20
+
+After this analysis we proceed to run the files in the FASTQC program. We have some problems in the remotion of overrepresented sequences and thus our FASTQC program output does not show this problems as fixed.
+Finally, after this the files should be in shape to be used in Alignment or mapping analysis.
+
