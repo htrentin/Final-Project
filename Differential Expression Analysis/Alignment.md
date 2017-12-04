@@ -10,3 +10,15 @@ After the quality control procedure we proceed to do the alignment to the 726 ma
 	$ STAR --genomeDir <Directory with the Genome Index>  --runThreadN <# cpus> --readFilesIn <FASTQ file> --outFileNamePrefix <OutputPrefix>
 
 The package STAR will create several output files from which the "*.Aligned.out.sam" is the most importan, since this one was the file used to make the Differential expression analysis using the featureCounts() function in R.
+
+# RSUBREADS PACKAGE #
+
+The package is for R software and belongs to the Bioconductor organization. The package can be installed as follows:
+
+	$ try http:// if https:// URLs are not supported
+	$ source("https://bioconductor.org/biocLite.R")
+	$ biocLite("Rsubread")
+
+The function should be used as indicated in the [FeatureCounts Documentation](https://www.rdocumentation.org/packages/Rsubread/versions/1.22.2/topics/featureCounts).
+	
+This will finally provide a file that is going top be used by the DESeq2 package of R to make the differential expression analysis.
