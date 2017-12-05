@@ -15,6 +15,7 @@ Then to reproduce the analysis we start by downloading and loading the respectiv
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
 library(DESeq2)
+if(!require("dplyr")) install.packages("dplyr")
 library(dplyr)
 #For theRsubreads
 #source("https://bioconductor.org/biocLite.R")
@@ -60,25 +61,26 @@ dds <- DESeqDataSetFromMatrix(countData = cts,
 
 #Modeling the samples
 dds <- DESeq(dds)
+res <- results(dds)
 resultsNames(dds) #Names of the explanatory variable
 
 #Way to produce all contrast between the 6 type of cells (15 contrasts)
-
-ACvsBC <- as.data.frame(results(dds, contrast = list("CellApical","CellBasal" ) ))
-ACvsEC <- as.data.frame(results(dds, contrast = list("CellApical","CellEgg" ) ))
-ACvsSP <- as.data.frame(results(dds, contrast = list("CellApical","CellSperm" ) ))
-ACvsZy12 <- as.data.frame(results(dds, contrast = list("CellApical","CellZygote_12HAP" ) ))
-ACvsZy24 <- as.data.frame(results(dds, contrast = list("CellApical","CellZygote_24HAP" ) ))
-BCvsEC <- as.data.frame(results(dds, contrast = list("CellBasal","CellEgg" ) ))
-BCvsSP <- as.data.frame(results(dds, contrast = list("CellBasal","CellSperm" ) ))
-BCvsZy12 <- as.data.frame(results(dds, contrast = list("CellBasal","CellZygote_12HAP" ) ))
-BCvsZy24 <- as.data.frame(results(dds, contrast = list("CellBasal","CellZygote_24HAP" ) ))
-ECvsSP <- as.data.frame(results(dds, contrast = list("CellEgg","CellSperm" ) ))
-ECvsZy12 <- as.data.frame(results(dds, contrast = list("CellEgg","CellZygote_12HAP" ) ))
-ECvsZy24 <- as.data.frame(results(dds, contrast = list("CellEgg","CellZygote_24HAP" ) ))
-SPvsZy12 <- as.data.frame(results(dds, contrast = list("CellSperm","CellZygote_12HAP" ) ))
-SPvsZy24 <- as.data.frame(results(dds, contrast = list("CellSperm","CellZygote_24HAP" ) ))
-Zy12vsZy24 <- as.data.frame(results(dds, contrast = list("CellZygote_12HAP","CellZygote_24HAP" ), alpha = 0.05 ))
+# for contrast, the first name in the name of the column Cell, the second and third are the names of the variables to be contrasted.
+ACvsBC <- as.data.frame(results(dds, contrast = c('Cell',"Apical","Basal" ), na.rm =TRUE  ))
+ACvsEC <- as.data.frame(results(dds, contrast = c('Cell',"Apical","Egg" ), na.rm =TRUE  ))
+ACvsSP <- as.data.frame(results(dds, contrast = c('Cell', "Apical","Sperm" ), na.rm =TRUE  ))
+ACvsZy12 <- as.data.frame(results(dds, contrast = c('Cell',"Apical","Zygote_12HAP" ), na.rm =TRUE  ))
+ACvsZy24 <- as.data.frame(results(dds, contrast = c('Cell',"Apical","Zygote_24HAP" ), na.rm =TRUE  ))
+BCvsEC <- as.data.frame(results(dds, contrast = c('Cell',"Basal","Egg" ), na.rm =TRUE  ))
+BCvsSP <- as.data.frame(results(dds, contrast = c('Cell',"Basal","Sperm" ), na.rm =TRUE  ))
+BCvsZy12 <- as.data.frame(results(dds, contrast = c('Cell',"Basal","Zygote_12HAP" ), na.rm =TRUE  ))
+BCvsZy24 <- as.data.frame(results(dds, contrast = c('Cell',"Basal","Zygote_24HAP" ), na.rm =TRUE  ))
+ECvsSP <- as.data.frame(results(dds, contrast = c('Cell',"Egg","Sperm" ), na.rm =TRUE  ))
+ECvsZy12 <- as.data.frame(results(dds, contrast = c('Cell',"Egg","Zygote_12HAP" ) , na.rm =TRUE ))
+ECvsZy24 <- as.data.frame(results(dds, contrast = c('Cell',"Egg","Zygote_24HAP" ), na.rm =TRUE  ))
+SPvsZy12 <- as.data.frame(results(dds, contrast = c('Cell',"Sperm","Zygote_12HAP" ) , na.rm =TRUE ))
+SPvsZy24 <- as.data.frame(results(dds, contrast = c('Cell',"Sperm","Zygote_24HAP" ), na.rm =TRUE  ))
+Zy12vsZy24 <- as.data.frame(results(dds, contrast =c('Cell',"Zygote_12HAP","Zygote_24HAP" ), na.rm =TRUE ))
 
 # Loop to filter the data by Log2FoldChange >= |1.0| and FDR (padj) <= 0.05
 
@@ -87,9 +89,10 @@ res <- list(ACvsBC, ACvsEC, ACvsSP,ACvsZy12, ACvsZy24, BCvsEC, BCvsSP, BCvsZy12,
 
       # creation of a list of the name of the sorted files.
 nombre <- c('ACvsBC', 'ACvsEC', 'ACvsSP','ACvsZy12', 'ACvsZy24', 'BCvsEC', 'BCvsSP', 'BCvsZy12', 'BCvsZy24', 'ECvsSP', 'ECvsZy12', 'ECvsZy24', 'SPvsZy12', 'SPvsZy24', 'Zy12vsZy24') #Creation of 
+setwd("C:/Users/deer1/Desktop/BCB546/figure 4 final project")
 
 for(i in seq_along(res)){
-  a <- filter(res[[i]], padj <= 0.05 & abs(log2FoldChange) >= 1.0 )  
+  a <- filter(res[[i]], res[[i]]$padj <= 0.05 & abs(res[[i]]$log2FoldChange) >= 1.0 )  
   for(n in nombre){
   savename = paste0('DE_DESeq2_', n, '.csv')
   write.table(a, file = savename, quote = FALSE, sep = ",", row.names = FALSE)
