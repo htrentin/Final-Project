@@ -1,0 +1,172 @@
+﻿New Table( "Top80 Egg Cells",
+	Add Rows( 80 ),
+	New Script(
+		"Source",
+		Open(
+			"C:\Users\htrentin\Desktop\Final 546 Project\EggCells-Fig2A.xlsx",
+			Worksheets( "Top80 Egg Cells" ),
+			Use for all sheets( 1 ),
+			Concatenate Worksheets( 0 ),
+			Create Concatenation Column( 0 ),
+			Worksheet Settings(
+				1,
+				Has Column Headers( 1 ),
+				Number of Rows in Headers( 1 ),
+				Headers Start on Row( 1 ),
+				Data Starts on Row( 2 ),
+				Data Starts on Column( 1 ),
+				Data Ends on Row( 0 ),
+				Data Ends on Column( 0 ),
+				Replicated Spanned Rows( 1 ),
+				Replicated Spanned Headers( 0 ),
+				Suppress Hidden Rows( 1 ),
+				Suppress Hidden Columns( 1 ),
+				Suppress Empty Columns( 1 ),
+				Treat as Hierarchy( 0 ),
+				Multiple Series Stack( 0 ),
+				Import Cell Colors( 0 ),
+				Limit Column Detect( 0 ),
+				Column Separator String( "-" )
+			)
+		)
+	),
+	New Script(
+		"Figure 2-B - Script",
+		Cell Plot(
+			Scale Uniformly( 1 ),
+			Center at zero( 0 ),
+			Y( :Os_EC, :Zm_EC ),
+			Label( :ZmID, :Os_ID ),
+			Legend( 1 ),
+			SendToReport(
+				Dispatch(
+					{},
+					"Cell Plot Report",
+					FrameBox,
+					{Frame Size( 189, 39 )}
+				)
+			)
+		)
+	),
+	New Script(
+		"Figure 2-B - Script 2",
+		Cell Plot(
+			Scale Uniformly( 1 ),
+			Center at zero( 0 ),
+			Y( :Os_EC, :Zm_EC ),
+			Label( :ZmID, :Os_ID ),
+			Legend( 1 ),
+			SendToReport(
+				Dispatch(
+					{},
+					"Cell Plot Report",
+					FrameBox,
+					{Frame Size( 189, 39 )}
+				),
+				Dispatch(
+					{},
+					"",
+					CellPlotBox,
+					{Color Theme(
+						{"Henrique", 2051, {{254, 254, 232}, {254, 254, 216}, {254,
+						254, 59}, {254, 254, 20}, {254, 253, 0}, {255, 64, 64}, {255,
+						21, 21}, {204, 0, 0}, {151, 0, 0}}, {0, 0.125, 0.25, 0.375,
+						0.5, 0.625, 0.749287749287749, 0.883190883190883, 1}}
+					)}
+				)
+			)
+		)
+	),
+	New Column( "ZmID",
+		Character,
+		"Nominal",
+		Set Values(
+			{"GRMZM2G075386", "GRMZM2G466856", "GRMZM2G137839", "GRMZM2G180625",
+			"GRMZM2G466848", "AC185611.3_FG001", "GRMZM2G382914", "GRMZM2G047842",
+			"GRMZM2G326111", "GRMZM5G850966", "GRMZM2G025720", "GRMZM2G006324",
+			"GRMZM2G409726", "GRMZM2G181192", "GRMZM2G358059", "GRMZM2G438301",
+			"GRMZM2G038851", "GRMZM2G028379", "GRMZM6G735128", "GRMZM2G152466",
+			"GRMZM2G153541", "GRMZM2G048371", "GRMZM2G119675", "GRMZM2G113696",
+			"GRMZM2G456746", "GRMZM2G093503", "GRMZM2G066460", "GRMZM2G157018",
+			"GRMZM5G840909", "GRMZM5G815894", "GRMZM2G577677", "GRMZM5G837108",
+			"GRMZM5G833389", "GRMZM2G176307", "GRMZM2G012631", "GRMZM2G343543",
+			"GRMZM2G088847", "GRMZM2G144387", "GRMZM2G124791", "GRMZM2G013457",
+			"GRMZM2G153292", "GRMZM2G102471", "GRMZM2G012012", "GRMZM2G112165",
+			"GRMZM5G800112", "GRMZM2G392306", "GRMZM2G415359", "AC230013.2_FG007",
+			"GRMZM2G144653", "GRMZM2G088511", "GRMZM2G030784", "GRMZM2G006704",
+			"GRMZM2G438551", "GRMZM2G035685", "GRMZM2G122481", "GRMZM2G019325",
+			"GRMZM2G112795", "GRMZM2G171426", "GRMZM2G088212", "GRMZM2G009359",
+			"GRMZM2G053898", "GRMZM2G148744", "GRMZM2G079746", "GRMZM2G061950",
+			"GRMZM2G147791", "GRMZM2G064302", "GRMZM2G177828", "GRMZM2G419891",
+			"GRMZM2G082390", "GRMZM2G071630", "GRMZM2G354604", "GRMZM6G729818",
+			"AC190609.3_FG002", "GRMZM2G032003", "GRMZM2G115621", "GRMZM2G018728",
+			"GRMZM2G139210", "GRMZM2G122871", "GRMZM5G835323", "AC205122.4_FG003"}
+		)
+	),
+	New Column( "Zm_EC",
+		Numeric,
+		"Continuous",
+		Format( "Best", 15 ),
+		Set Values(
+			[200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+			200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+			200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+			200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+			200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200,
+			200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+		)
+	),
+	New Column( "Os_ID",
+		Character,
+		"Nominal",
+		Set Values(
+			{"", "", "Os03g17690", "Os08g03290", "", "", "Os02g07260", "Os01g61360",
+			"Os02g02890", "Os05g38520", "Os04g50800", "Os07g38710", "Os06g46770",
+			"Os08g09250", "Os07g14270", "Os01g58590", "Os04g49130", "Os03g48080", "",
+			"Os11g14220", "Os03g08020", "Os10g08550", "Os03g40920", "Os07g40580", "",
+			"Os05g46450", "Os12g03880", "Os08g37320", "", "Os01g67134", "Os03g24600",
+			"Os02g48720", "Os01g60190", "Os04g40950", "Os09g30412", "Os03g08020",
+			"Os12g01680", "Os08g44380", "Os03g38520", "Os02g18550", "Os11g14220",
+			"Os04g57220", "", "Os09g30412", "Os08g27850", "Os06g12360", "Os10g33800",
+			"Os05g49030", "Os12g18220", "", "Os01g05490", "Os12g37419", "Os01g58890",
+			"Os04g50800", "Os12g37419", "Os04g52361", "", "Os01g52490", "Os06g51150",
+			"", "Os01g68950", "Os09g08430", "Os05g46450", "Os02g51750", "Os05g28750",
+			"Os06g04510", "", "Os06g46770", "Os01g68950", "Os04g40950", "Os05g49890",
+			"Os09g38030", "", "Os09g38030", "Os06g50000", "Os03g20630", "Os07g29390",
+			"Os06g37440", "Os07g34589", "Os07g01780"}
+		)
+	),
+	New Column( "Os_EC",
+		Numeric,
+		"Continuous",
+		Format( "Best", 15 ),
+		Set Values(
+			[., ., 200, 147, ., ., 200, ., 200, 200, 10, 1, 200, 140, 195, 27, 23,
+			200, ., 200, 132, 200, 137, 134, ., 114, 88, 168, ., 118, 116, 200, 170,
+			200, 200, 132, 21, 160, 120, 200, 200, 200, ., 200, 192, 41, 200, 200, 1,
+			., 200, 86, 74, 10, 86, 114, ., 115, 162, ., 164, 200, 114, 107, 44, 38,
+			., 200, 164, 200, 200, 114, ., 114, 130, 105, 49, 184, 200, 1]
+		)
+	)
+) << Run Formulas;
+Cell Plot(
+	Scale Uniformly( 1 ),
+	Center at zero( 0 ),
+	Y( :Os_EC, :Zm_EC ),
+	Label( :ZmID, :Os_ID ),
+	Legend( 1 ),
+	SendToReport(
+		Dispatch( {}, "Cell Plot Report", FrameBox, {Frame Size( 189, 39 )} ),
+		Dispatch(
+			{},
+			"",
+			CellPlotBox,
+			{Color Theme(
+				{"Henrique", 2051, {{254, 254, 232}, {254, 254, 216}, {254, 254, 59},
+				{254, 254, 20}, {254, 253, 0}, {255, 64, 64}, {255, 21, 21}, {204, 0,
+				0}, {151, 0, 0}}, {0, 0.125, 0.25, 0.375, 0.5, 0.625,
+				0.749287749287749, 0.883190883190883, 1}}
+			)}
+		)
+	)
+);
